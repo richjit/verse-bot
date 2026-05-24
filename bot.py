@@ -1,10 +1,13 @@
 import os
+import pathlib
 
 import discord
 from discord import app_commands
 from dotenv import load_dotenv
 
 load_dotenv()
+
+BANNER_PATH = pathlib.Path(__file__).parent / "assets" / "banner.png"
 
 EMBED_COLOR = 0x7C3AED
 
@@ -105,16 +108,16 @@ async def on_ready():
 
 @tree.command(name="whatisverse", description="Learn what Verse is")
 async def whatisverse(interaction: discord.Interaction):
-    embed = discord.Embed(
-        title="🔮 WHAT IS VERSE?",
-        description=WHAT_IS_VERSE,
-        color=EMBED_COLOR,
-    )
-    file = discord.File("assets/banner.png", filename="banner.png")
-    embed.set_image(url="attachment://banner.png")
     try:
+        embed = discord.Embed(
+            title="🔮 WHAT IS VERSE?",
+            description=WHAT_IS_VERSE,
+            color=EMBED_COLOR,
+        )
+        file = discord.File(BANNER_PATH, filename="banner.png")
+        embed.set_image(url="attachment://banner.png")
         await interaction.response.send_message(file=file, embed=embed, view=LinksView())
-    except discord.HTTPException:
+    except (discord.HTTPException, FileNotFoundError, OSError):
         await interaction.response.send_message(
             "Something went wrong. Try again in a moment.", ephemeral=True
         )
@@ -122,20 +125,20 @@ async def whatisverse(interaction: discord.Interaction):
 
 @tree.command(name="howtocontribute", description="Learn how to contribute to Verse")
 async def howtocontribute(interaction: discord.Interaction):
-    embed = discord.Embed(
-        title="🤝 HOW TO CONTRIBUTE",
-        description=HOW_TO_CONTRIBUTE,
-        color=EMBED_COLOR,
-    )
-    file = discord.File("assets/banner.png", filename="banner.png")
-    embed.set_image(url="attachment://banner.png")
     try:
+        embed = discord.Embed(
+            title="🤝 HOW TO CONTRIBUTE",
+            description=HOW_TO_CONTRIBUTE,
+            color=EMBED_COLOR,
+        )
+        file = discord.File(BANNER_PATH, filename="banner.png")
+        embed.set_image(url="attachment://banner.png")
         await interaction.response.send_message(file=file, embed=embed, view=LinksView())
-    except discord.HTTPException:
+    except (discord.HTTPException, FileNotFoundError, OSError):
         await interaction.response.send_message(
             "Something went wrong. Try again in a moment.", ephemeral=True
         )
 
 
 if __name__ == "__main__":
-    client.run(os.getenv("DISCORD_TOKEN"))
+    client.run(os.environ["DISCORD_TOKEN"])
