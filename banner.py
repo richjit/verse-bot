@@ -29,6 +29,7 @@ def generate_banner(output_path="assets/banner.png"):
         title_font = ImageFont.truetype(FONT_PATH, 130)
         tagline_font = ImageFont.truetype(FONT_PATH, 48)
     except OSError:
+        print(f"Warning: font not found at {FONT_PATH}, falling back to default (text will look small)")
         title_font = ImageFont.load_default()
         tagline_font = ImageFont.load_default()
 
