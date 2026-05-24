@@ -1,6 +1,5 @@
 import discord
 from discord import app_commands
-import os
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -95,5 +94,8 @@ class LinksView(discord.ui.View):
 
 @client.event
 async def on_ready():
-    await tree.sync()
-    print(f"Logged in as {client.user} — commands synced globally (may take up to 1 hour to appear).")
+    try:
+        await tree.sync()
+        print(f"Logged in as {client.user} — commands synced globally (may take up to 1 hour to appear).")
+    except discord.HTTPException as e:
+        print(f"Command sync failed: {e}")

@@ -34,3 +34,9 @@ def test_links_view_urls():
         assert "https://x.com/realthomasgu" in urls
 
     asyncio.run(check())
+
+
+def test_string_constants_exist():
+    import bot
+    assert isinstance(bot.WHAT_IS_VERSE, str) and len(bot.WHAT_IS_VERSE) > 100
+    assert isinstance(bot.HOW_TO_CONTRIBUTE, str) and len(bot.HOW_TO_CONTRIBUTE) > 100
