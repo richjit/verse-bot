@@ -1,3 +1,6 @@
+import asyncio
+
+
 def test_bot_module_imports():
     import bot
     assert hasattr(bot, "client")
@@ -11,15 +14,23 @@ def test_embed_color_constant():
 
 def test_links_view_has_three_buttons():
     import bot
-    view = bot.LinksView()
-    buttons = [c for c in view.children if hasattr(c, "url")]
-    assert len(buttons) == 3
+
+    async def check():
+        view = bot.LinksView()
+        buttons = [c for c in view.children if hasattr(c, "url")]
+        assert len(buttons) == 3
+
+    asyncio.run(check())
 
 
 def test_links_view_urls():
     import bot
-    view = bot.LinksView()
-    urls = {c.url for c in view.children if hasattr(c, "url")}
-    assert "https://runwiseai.app/" in urls
-    assert "https://x.com/useverseai" in urls
-    assert "https://x.com/realthomasgu" in urls
+
+    async def check():
+        view = bot.LinksView()
+        urls = {c.url for c in view.children if hasattr(c, "url")}
+        assert "https://runwiseai.app/" in urls
+        assert "https://x.com/useverseai" in urls
+        assert "https://x.com/realthomasgu" in urls
+
+    asyncio.run(check())

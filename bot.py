@@ -75,19 +75,7 @@ tree = app_commands.CommandTree(client)
 
 class LinksView(discord.ui.View):
     def __init__(self):
-        # Manually initialize to avoid requiring a running event loop at import/test time.
-        # discord.ui.View.__init__ calls asyncio.get_running_loop() for its __stopped future,
-        # which fails outside an async context. We replicate the setup without that call.
-        from discord.ui.view import _ViewWeights
-        self._View__timeout = None
-        self._children: list = self._init_children()
-        self._View__weights = _ViewWeights(self._children)
-        self.id = os.urandom(16).hex()
-        self._cache_key = None
-        self._View__cancel_callback = None
-        self._View__timeout_expiry = None
-        self._View__timeout_task = None
-        self._View__stopped = None
+        super().__init__()
         self.add_item(discord.ui.Button(
             label="🌐 Website",
             url="https://runwiseai.app/",
