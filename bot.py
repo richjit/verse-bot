@@ -1,3 +1,5 @@
+import os
+
 import discord
 from discord import app_commands
 from dotenv import load_dotenv
@@ -99,3 +101,41 @@ async def on_ready():
         print(f"Logged in as {client.user} — commands synced globally (may take up to 1 hour to appear).")
     except discord.HTTPException as e:
         print(f"Command sync failed: {e}")
+
+
+@tree.command(name="whatisverse", description="Learn what Verse is")
+async def whatisverse(interaction: discord.Interaction):
+    embed = discord.Embed(
+        title="🔮 WHAT IS VERSE?",
+        description=WHAT_IS_VERSE,
+        color=EMBED_COLOR,
+    )
+    file = discord.File("assets/banner.png", filename="banner.png")
+    embed.set_image(url="attachment://banner.png")
+    try:
+        await interaction.response.send_message(file=file, embed=embed, view=LinksView())
+    except discord.HTTPException:
+        await interaction.response.send_message(
+            "Something went wrong. Try again in a moment.", ephemeral=True
+        )
+
+
+@tree.command(name="howtocontribute", description="Learn how to contribute to Verse")
+async def howtocontribute(interaction: discord.Interaction):
+    embed = discord.Embed(
+        title="🤝 HOW TO CONTRIBUTE",
+        description=HOW_TO_CONTRIBUTE,
+        color=EMBED_COLOR,
+    )
+    file = discord.File("assets/banner.png", filename="banner.png")
+    embed.set_image(url="attachment://banner.png")
+    try:
+        await interaction.response.send_message(file=file, embed=embed, view=LinksView())
+    except discord.HTTPException:
+        await interaction.response.send_message(
+            "Something went wrong. Try again in a moment.", ephemeral=True
+        )
+
+
+if __name__ == "__main__":
+    client.run(os.getenv("DISCORD_TOKEN"))

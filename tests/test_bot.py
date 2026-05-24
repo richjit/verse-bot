@@ -40,3 +40,28 @@ def test_string_constants_exist():
     import bot
     assert isinstance(bot.WHAT_IS_VERSE, str) and len(bot.WHAT_IS_VERSE) > 100
     assert isinstance(bot.HOW_TO_CONTRIBUTE, str) and len(bot.HOW_TO_CONTRIBUTE) > 100
+
+
+def test_commands_registered():
+    import bot
+    names = {cmd.name for cmd in bot.tree.get_commands()}
+    assert "whatisverse" in names
+    assert "howtocontribute" in names
+
+
+def test_whatisverse_contains_key_phrases():
+    import bot
+    assert "next generation of AI employees" in bot.WHAT_IS_VERSE
+    assert "runwiseai.app" in bot.WHAT_IS_VERSE
+    assert "🚀 What Makes Verse Different" in bot.WHAT_IS_VERSE
+    assert "🧠 What Verse Agents Can Do" in bot.WHAT_IS_VERSE
+    assert "🔥 Where We're At" in bot.WHAT_IS_VERSE
+    assert "🌎 Our Mission" in bot.WHAT_IS_VERSE
+
+
+def test_howtocontribute_contains_channels():
+    import bot
+    assert "<#1507589532512419890>" in bot.HOW_TO_CONTRIBUTE
+    assert "<#1507589550904705156>" in bot.HOW_TO_CONTRIBUTE
+    assert "<#1507589377486885004>" in bot.HOW_TO_CONTRIBUTE
+    assert "<#1507589339373240382>" in bot.HOW_TO_CONTRIBUTE
