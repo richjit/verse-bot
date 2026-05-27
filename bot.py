@@ -1,8 +1,11 @@
 import os
 import pathlib
+import xml.etree.ElementTree as ET
 
+import aiohttp
 import discord
 from discord import app_commands
+from discord.ext import tasks
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -10,6 +13,17 @@ load_dotenv()
 BANNER_PATH = pathlib.Path(__file__).parent / "assets" / "banner.png"
 
 EMBED_COLOR = 0x7C3AED
+
+TWEETS_CHANNEL_ID = 1507589637466489015
+WATCH_ACCOUNTS = ["realthomasgu", "useverseai"]
+NITTER_INSTANCES = [
+    "https://nitter.poast.org",
+    "https://nitter.privacydev.net",
+    "https://nitter.1d4.us",
+]
+
+_seen_tweet_ids: set[str] = set()
+_initialized = False
 
 WHAT_IS_VERSE = (
     "Verse is building the next generation of AI employees.\n\n"
@@ -102,6 +116,69 @@ class LinksView(discord.ui.View):
         ))
 
 
+async def _fetch_rss(session: aiohttp.ClientSession, username: str) -> str | None:
+    for instance in NITTER_INSTANCES:
+        try:
+            url = f"{instance}/{username}/rss"
+            async with session.get(url, timeout=aiohttp.ClientTimeout(total=10)) as resp:
+                if resp.status == 200:
+                    return await resp.text()
+        except Exception:
+            continue
+    return None
+
+
+def _parse_latest(rss_text: str) -> tuple[str, str, str] | None:
+    try:
+        root = ET.fromstring(rss_text)
+        channel = root.find("channel")
+        if channel is None:
+            return None
+        item = channel.find("item")
+        if item is None:
+            return None
+        link = item.findtext("link", "")
+        title = item.findtext("title", "")
+        guid = item.findtext("guid", link)
+        return guid, title, link
+    except ET.ParseError:
+        return None
+
+
+@tasks.loop(minutes=5)
+async def check_tweets() -> None:
+    global _initialized
+    channel = client.get_channel(TWEETS_CHANNEL_ID)
+    if channel is None:
+        return
+
+    new_tweets: list[tuple[str, str, str]] = []
+    async with aiohttp.ClientSession() as session:
+        for username in WATCH_ACCOUNTS:
+            rss = await _fetch_rss(session, username)
+            if rss is None:
+                continue
+            result = _parse_latest(rss)
+            if result is None:
+                continue
+            guid, title, link = result
+            if guid not in _seen_tweet_ids:
+                _seen_tweet_ids.add(guid)
+                if _initialized:
+                    new_tweets.append((username, title, link))
+
+    _initialized = True
+
+    for username, title, link in new_tweets:
+        label = "Verse" if username == "useverseai" else "Thomas (Founder)"
+        await channel.send(f"@everyone 🐦 New tweet from **{label}**!\n{link}")
+
+
+@check_tweets.before_loop
+async def before_check_tweets() -> None:
+    await client.wait_until_ready()
+
+
 @client.event
 async def on_ready():
     try:
@@ -109,6 +186,7 @@ async def on_ready():
         print(f"Logged in as {client.user} — commands synced globally (may take up to 1 hour to appear).")
     except discord.HTTPException as e:
         print(f"Command sync failed: {e}")
+    check_tweets.start()
 
 
 @tree.command(name="whatisverse", description="Learn what Verse is")
