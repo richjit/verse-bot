@@ -35,7 +35,7 @@ WHAT_IS_VERSE = (
     "**🌎 Our Mission**\n"
     "We believe every person and business will have teams of AI employees working alongside them. "
     "Verse exists to make that accessible to everyone.\n\n"
-    "👉 **[runwiseai.app](https://runwiseai.app/)**"
+    "👉 **[useverse.ai](https://www.useverse.ai/)**"
 )
 
 HOW_TO_CONTRIBUTE = (
@@ -87,7 +87,7 @@ class LinksView(discord.ui.View):
         super().__init__()
         self.add_item(discord.ui.Button(
             label="🌐 Website",
-            url="https://runwiseai.app/",
+            url="https://www.useverse.ai/",
             style=discord.ButtonStyle.link,
         ))
         self.add_item(discord.ui.Button(
